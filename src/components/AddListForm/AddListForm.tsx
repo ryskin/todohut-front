@@ -16,7 +16,7 @@ export const AddListForm = () => {
       <div className="flex items-center"></div>
       <input
         {...register("listName", { required: true })}
-        className="flex-auto rounded-xl p-1 border-gray-300 w-full" />
+        className="flex-auto rounded-xl pl-3 pt-1 pb-1 border-gray-300 w-full" />
     </form>
   );
 };

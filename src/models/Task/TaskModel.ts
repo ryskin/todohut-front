@@ -34,12 +34,15 @@ export const TaskModel = types
       types.array(types.late(() => types.reference(CommentModel))),
       []
     ),
-    timeEstimate: types.maybe(types.number),
+    timeEstimate: types.maybeNull(types.number),
     dueDate: types.maybe(types.Date),
     createdAt: types.maybe(types.Date),
     updatedAt: types.maybe(types.Date),
   })
   .actions((self) => ({
+    addTimeEstimate(seconds: number){
+      self.timeEstimate = seconds;
+    },
     assignUser(userId: string) {
       const user = getRoot<RootStore>(self).user.findById(userId);
       if (user) {

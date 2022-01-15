@@ -9,13 +9,13 @@ import { UserStoreModel } from "./User/UserStore";
 import { localStorageMixin  } from "./extensions/localStorageMixin";
 
 export const RootStoreModel = types.model("RootStore", {
-  task: types.optional(TaskStoreModel, {}),
-  list: types.optional(ListStoreModel, {}),
-  taskStatus: types.optional(TaskStatusStoreModel, {}),
-  taskToTask: types.optional(TaskToTaskStoreModel, {}),
-  timeLog: types.optional(TimeLogStoreModel, {}),
-  user: types.optional(UserStoreModel, {}),
-  comment: types.optional(CommentStoreModel, {}),
+  task: types.optional(TaskStoreModel, {} as any),
+  list: types.optional(ListStoreModel, {} as any),
+  taskStatus: types.optional(TaskStatusStoreModel, {} as any),
+  taskToTask: types.optional(TaskToTaskStoreModel, {} as any),
+  timeLog: types.optional(TimeLogStoreModel, {} as any),
+  user: types.optional(UserStoreModel, {} as any),
+  comment: types.optional(CommentStoreModel, {} as any),
 })
 .extend(
   localStorageMixin({

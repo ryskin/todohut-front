@@ -1,7 +1,7 @@
 import { UserIcon } from "@heroicons/react/outline";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../../models/StoreContext";
-import { colorsFromText } from "../../utils/basic";
+import { colorsFromText, getIdealTextColor } from "../../utils/basic";
 
 import { Popover } from "../Popover";
 
@@ -24,14 +24,17 @@ const UserItem = ({
     handleClick(id);
   };
 
+  const bgColor = colorsFromText(initials);
+  const textColor = getIdealTextColor(bgColor);
+
   return (
     <div
       onClick={handleClickUser}
       className="flex items-center pl-2 pb-2 pt-2 cursor-pointer hover:bg-gray-100"
     >
       <div
-        className="flex justify-center bg-yellow-300 items-center rounded-full w-8 h-8 font-semibold"
-        style={{ backgroundColor: colorsFromText(initials) }}
+        className={`${textColor} flex justify-center bg-yellow-300 items-center rounded-full w-8 h-8 font-semibold`}
+        style={{ backgroundColor: bgColor }}
       >
         <div>{initials}</div>
       </div>

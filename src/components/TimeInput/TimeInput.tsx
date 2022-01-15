@@ -1,10 +1,11 @@
 import { useState } from "react";
 
-export const TimeInput = () => {
+export const TimeInput = ({ onChange }: { onChange: (secs: number) => void }) => {
   const [value, setValue] = useState("0:00");
 
-  const onChange = (event: any) => {
-    setValue(event.target.value);
+  const handleChange = (event: any) => {
+    const value = event.target.value;
+    setValue(value);
   };
 
   const isNumber = (value: string) => {
@@ -38,6 +39,7 @@ export const TimeInput = () => {
       setValue(minutesToHours(Number(minutes)));
       return;
     }
+    onChange(Number(hours) * 3600 + Number(minutes)*60);
     setValue(`${hours || "00"}:${minutes || "00"}`);
   }
 
@@ -53,9 +55,8 @@ export const TimeInput = () => {
 
   return (
     <div className="flex flex-col items-center content-center">
-      {/* <h2 className="text-md font-bold mb-2">Time Estimate:</h2> */}
       <input
-        onChange={onChange}
+        onChange={handleChange}
         onKeyDown={handleKeyDown}
         onBlur={onBlur}
         value={value}

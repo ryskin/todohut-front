@@ -55,3 +55,15 @@ export const numberFromText = (text: string) =>{
 export const colorsFromText = (text: string) => {
   return colors[numberFromText(text) % colors.length];
 };
+
+export const HHMMToSeconds = (hhmm: string) => {
+  const [hh, mm] = hhmm.split(":");
+  return parseInt(hh) * 60 * 60 + parseInt(mm) * 60;
+};
+
+export const secondsToHHMM = (seconds: number) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds - hours * 3600) / 60);
+  console.log("se", seconds, hours, minutes)
+  return `${toTwoDigitString(hours)}:${toTwoDigitString(minutes)}`;
+}

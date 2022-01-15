@@ -35,7 +35,7 @@ export const AddTaskStatusForm = ({ children }: any) => {
       <div onClick={() => setShow(true)}>
         {children}
       </div>
-      <div className={`${show ? '' : 'invisible'} z-50 absolute mt-3 bg-white rounded-sm p-4 shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px]`}>
+      <div className={`${show ? '' : 'invisible'} z-50 absolute mt-3 bg-white rounded-xl p-4 shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px]`}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex items-center mb-5">
             <label className="flex-auto gap-1">

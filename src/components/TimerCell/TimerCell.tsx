@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { useState } from "react";
-import { Timer } from "../../components/Timer/Timer";
+import { Timer } from "../Timer/Timer";
 import { useStore } from "../../models/StoreContext";
 
 export const TimerCell = observer(({ taskId }: { taskId: string }) => {

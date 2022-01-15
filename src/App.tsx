@@ -1,8 +1,8 @@
-import { Route, useRoutes } from "react-router-dom";
-import { ToDoTable } from "./components/ToDoTable";
+import { useRoutes } from "react-router-dom";
 import { MainLayout } from "./layout/MainLayout";
+import { TasksLayout } from "./layout/TasksLayout";
 import { createStore } from "./models/RootStore";
-import { StoreProvider, useStore } from "./models/StoreContext";
+import { StoreProvider } from "./models/StoreContext";
 import "./tailwind.css";
 
 const routes = [{
@@ -10,8 +10,9 @@ const routes = [{
   path: "/",
   children: [
     {
-      element: <ToDoTable />,
-    }
+      element: <TasksLayout />,
+      path: "/",
+    },
   ]
 }];
 

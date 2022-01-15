@@ -20,18 +20,24 @@ import { getIdealTextColor } from "../../utils/basic";
 import { Modal } from "../Modal";
 import { Popover } from "../Popover";
 import { TimeInput } from "../TimeInput/TimeInput";
-import { TimerCell } from "../../container/TimerCell/TimerCell";
+import { TimerCell } from "../TimerCell/TimerCell";
 import { UsersPopover } from "../UsersPopover/UsersPopover";
+import { TimeEstimateCell } from "../TimeEstimateCell";
 
 type GropedTasks = {
   [key: string]: Task[] | any;
 };
 
 export const ToDoTable = observer(() => {
-  const { task: taskStore, taskStatus: taskStatusStore } = useStore();
+  const {
+    task: taskStore,
+    taskStatus: taskStatusStore,
+    list: listStore,
+  } = useStore();
 
-  const groupedTasksByStatus = taskStore.parents.reduce(
-    (acc: GropedTasks, task) => {
+  const groupedTasksByStatus = taskStore.parents
+    .filter((task) => task?.list?.id === listStore?.selected?.id)
+    .reduce((acc: GropedTasks, task) => {
       const {
         status: { name: statusName },
       } = task;
@@ -46,9 +52,7 @@ export const ToDoTable = observer(() => {
         })),
       });
       return acc;
-    },
-    {}
-  );
+    }, {});
 
   const columns = [
     {
@@ -82,7 +86,6 @@ export const ToDoTable = observer(() => {
             {row.original.parent ? (
               <div
                 {...row.getToggleRowExpandedProps({
-                  // className: "ml-2",
                   style: {
                     paddingLeft: `${row.depth * 0.5}rem`,
                   },
@@ -106,9 +109,9 @@ export const ToDoTable = observer(() => {
       accessor: "name",
       disableFilters: true,
       Cell: ({ row, value }: CellProps<Task>) => (
-        <div className="flex flex-row items-center">
+        <div className="flex flex-row items-center font-semibold text-gray-700">
           <div>{value}</div>
-          <div className="mr-2">{row.original.id}</div>
+          <div className="ml-1" />
           <div>
             <Modal
               title={`Add task ${`to ${row.original.name}`}`}
@@ -129,21 +132,8 @@ export const ToDoTable = observer(() => {
       Header: "Time estimate",
       accessor: "timeEstimate",
       disableFilters: true,
-      Cell: ({ value }: CellProps<Task>) => (
-        <div className="flex justify-center">
-          <Popover
-            clickComponent={
-              <>
-                <ClockIcon className="w-4 h-4 text-gray-400 cursor-pointer" />{" "}
-                {value || ""}
-              </>
-            }
-          >
-            <div className="flex flex-col">
-              <TimeInput />
-            </div>
-          </Popover>
-        </div>
+      Cell: ({ value, row: { original: { id } } }: CellProps<Task>) => (
+        <TimeEstimateCell taskId={id} value={value} />
       ),
     },
     {
@@ -160,78 +150,78 @@ export const ToDoTable = observer(() => {
       accessor: "assignees",
       disableFilters: true,
       Cell: ({ row }: CellProps<any>) => (
-        <UsersPopover taskId={row.original.id}/>
+        <UsersPopover taskId={row.original.id} />
       ),
     },
-{
-  Header: "Due date",
-    accessor: "dueDate",
+    {
+      Header: "Due date",
+      accessor: "dueDate",
       disableFilters: true,
-        Cell: ({ value }: CellProps<any>) => (
-          <div className="flex">
-            <CalendarIcon className="w-4 h-4 text-gray-400" /> {value || ""}
-          </div>
-        ),
+      Cell: ({ value }: CellProps<any>) => (
+        <div className="flex">
+          <CalendarIcon className="w-4 h-4 text-gray-400" /> {value || ""}
+        </div>
+      ),
     },
-{
-  Header: "Priority",
-    accessor: "priority",
+    {
+      Header: "Priority",
+      accessor: "priority",
       disableFilters: true,
-        Cell: ({ value }: CellProps<any>) => (
-          <div className="flex">
-            <FlagIcon className="w-4 h-4 text-gray-400" />
-          </div>
-        ),
+      Cell: ({ value }: CellProps<any>) => (
+        <div className="flex">
+          <FlagIcon className="w-4 h-4 text-gray-400" />
+        </div>
+      ),
     },
-{
-  id: "actions",
-    Cell: ({ row }: CellProps<any>) => (
-      <DotsHorizontalIcon className="cursor-pointer h-5 w-5 text-gray-100" />
-    ),
+    {
+      id: "actions",
+      Cell: ({ row }: CellProps<any>) => (
+        <DotsHorizontalIcon className="cursor-pointer h-5 w-5 text-gray-100" />
+      ),
     },
   ];
 
-return (
-  <div className="p-4">
-    {taskStatusStore.statuses.length === 0 && (
-      <div>
-        <AddTaskStatusForm>"No statuses, create first."</AddTaskStatusForm>
-      </div>
-    )}
-    {taskStatusStore.statuses.map((status: string) => {
-      const tasks = groupedTasksByStatus[status];
-      const statusId = taskStatusStore.items.find(
-        (statusObj) => statusObj.name === status
-      )?.id;
-      const statusColor = taskStatusStore.items.find(
-        (statusObj) => statusObj.name === status
-      )?.color;
+  return (
+    <div className="p-4">
+      {taskStatusStore.statuses.length === 0 && (
+        <div>
+          <AddTaskStatusForm>"No statuses, create first."</AddTaskStatusForm>
+        </div>
+      )}
+      {taskStatusStore.statuses.map((status: string) => {
+        const tasks = groupedTasksByStatus[status];
+        const statusId = taskStatusStore.items.find(
+          (statusObj) => statusObj.name === status
+        )?.id;
+        const statusColor = taskStatusStore.items.find(
+          (statusObj) => statusObj.name === status
+        )?.color;
 
-      if (!statusId) return "Cтатус не найден";
-      return (
-        <div className="mb-4">
-          <div className="flex flex-row">
-            <div
-              style={{ backgroundColor: statusColor }}
-              className={`${getIdealTextColor(
-                statusColor
-              )} gap-1 items-center inline-flex p-2 font-medium  rounded-t text-xs tracking-wider uppercase bg-green-500 text-white`}
-            >
-              <div>{status}</div>
+        if (!statusId) return "Cтатус не найден";
+        return (
+          <div className="mb-4">
+            <div className="flex flex-row">
+              <div
+                style={{ backgroundColor: statusColor }}
+                className={`${getIdealTextColor(
+                  statusColor
+                )} gap-1 items-center inline-flex p-2 font-medium  rounded-t text-xs tracking-wider uppercase bg-green-500 text-white`}
+              >
+                <div>{status}</div>
 
-              <div>
-                <AddTaskStatusForm>
-                  <FolderAddIcon className="w-4 h-4" />
-                </AddTaskStatusForm>
+                <div>
+                  <AddTaskStatusForm>
+                    <FolderAddIcon className="w-4 h-4" />
+                  </AddTaskStatusForm>
+                </div>
               </div>
             </div>
+            <Table columns={columns} data={tasks ? [...tasks] : []} />
+            <AddTaskForm statusId={statusId} />
+            <div className="text-xs text-gray-500 mt-1 ml-3">+ New task</div>
           </div>
-          <Table columns={columns} data={tasks ? [...tasks] : []} />
-          <AddTaskForm statusId={statusId} />
-          <div className="text-xs text-gray-500 mt-1 ml-3">+ New task</div>
-        </div>
-      );
-    })}
-  </div>
-);
+        );
+      })}
+    </div>
+  );
 });

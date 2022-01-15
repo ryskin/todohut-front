@@ -1,4 +1,5 @@
-import { types } from "mobx-state-tree";
+import { getRoot, types } from "mobx-state-tree";
+import { RootStore } from "../RootStoreModel";
 import { TaskStatusModel } from "./TaskStatusModel";
 
 const randomId = () => String(Math.floor(Math.random() * 1000000));
@@ -13,7 +14,9 @@ export const TaskStatusStoreModel = types.model("TaskStatusStore", {
     }))
     .actions(self => ({
         add(item: any) {
-            self.items.push({ ...item, id: randomId() });
+            const seletedList = getRoot<RootStore>(self).list.selected
+            if (!seletedList) alert("Please select a list")
+            self.items.push({ ...item, list: seletedList, id: randomId() });
         },
         remove(item: any) {
             self.items.remove(item);
