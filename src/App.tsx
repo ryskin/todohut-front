@@ -1,4 +1,5 @@
 import { useRoutes } from "react-router-dom";
+import { GanttPage } from "./components/GanttPage";
 import { MainLayout } from "./layout/MainLayout";
 import { TasksLayout } from "./layout/TasksLayout";
 import { createStore } from "./models/RootStore";
@@ -12,6 +13,10 @@ const routes = [{
     {
       element: <TasksLayout />,
       path: "/",
+    },
+    {
+      element: <GanttPage />,
+      path: "/gantt",
     },
   ]
 }];

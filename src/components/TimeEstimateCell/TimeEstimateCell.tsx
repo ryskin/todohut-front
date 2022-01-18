@@ -8,6 +8,7 @@ import { TimeInput } from "../TimeInput/TimeInput";
 export const TimeEstimateCell = observer(({ taskId, value }: { taskId: string, value: string }) => {
   const store = useStore();
   const task = store.task.findById(taskId);
+  const seconds = task?.timeEstimate ?? 0;
 
   return (
     <div className="flex justify-center">
@@ -21,7 +22,7 @@ export const TimeEstimateCell = observer(({ taskId, value }: { taskId: string, v
         }
       >
         <div className="flex flex-col">
-          <TimeInput onChange={(v: number) => task?.addTimeEstimate(v)} />
+          <TimeInput seconds={seconds} onChange={(v: number) => task?.addTimeEstimate(v)} />
         </div>
       </Popover>
     </div>

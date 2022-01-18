@@ -20,7 +20,7 @@ export const TaskModel = types
     name: types.string,
     description: types.maybe(types.string),
     priority: types.optional(
-      types.enumeration("Priority", ["none", "low", "medium", "high"]),
+      types.enumeration("Priority", ["none", "low", "medium", "high", "urgent"]),
       "none"
     ),
     list: types.maybe(types.late(() => types.reference(ListModel))),
@@ -46,8 +46,22 @@ export const TaskModel = types
     assignUser(userId: string) {
       const user = getRoot<RootStore>(self).user.findById(userId);
       if (user) {
+        if (self.assignees.includes(user)) return false;
         self.assignees.push(user);
+        return self.assignees;
       }
+    },
+    changeStatus(statusId: string) {
+      const statusInstance = getRoot<RootStore>(self).taskStatus.findById(statusId);
+      console.log(statusInstance);
+      if (statusInstance) {
+        self.status = statusInstance;
+        return self.status;
+      }
+    },
+    setPriority(status: typeof self['priority']) {
+      console.log(status);
+      self.priority = status;
     },
     removeAssignedUser(userId: string) {
       return self.assignees.replace(

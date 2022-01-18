@@ -98,7 +98,7 @@ export const Table = ({
     nextPage,
     previousPage,
     setPageSize,
-    state: { pageIndex, pageSize, groupBy, expanded, filters, selectedRowIds },
+    state: { pageIndex, groupBy, expanded, filters, selectedRowIds },
   } = useTable<any>(
     {
       columns,
@@ -106,7 +106,7 @@ export const Table = ({
       defaultColumn,
       filterTypes,
       // nestExpandedRows: true,
-      initialState: { pageIndex: 0 },
+      initialState: { pageIndex: 0, pageSize: 100 },
       // updateMyData isn't part of the API, but
       // anything we put into these options will
       // automatically be available on the instance.
@@ -227,6 +227,7 @@ export const Table = ({
                 <tr
                   {...row.getRowProps()}
                   className="bg-gradient-to-t from-gray-50 to-white hover:from-white-500 hover:to-blue-50"
+                  id={row?.original?.id}
                 >
                   {row.cells.map((cell: Cell<any>) => {
                     return (

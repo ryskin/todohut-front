@@ -1,3 +1,6 @@
+import { startOfWeek, endOfWeek, eachDayOfInterval, format } from "date-fns";
+import { ru } from "date-fns/locale";
+
 export const getIdealTextColor = (bgColor?: string) => {
   if (!bgColor) {
     return "text-white";
@@ -7,7 +10,7 @@ export const getIdealTextColor = (bgColor?: string) => {
   var bgDelta =
     components.R * 0.299 + components.G * 0.587 + components.B * 0.114;
 
-  return 255 - bgDelta < nThreshold ? "text-black" : "text-white";
+  return 300 - bgDelta < nThreshold ? "text-black" : "text-white";
 };
 
 const getRGBComponents = (color: string) => {
@@ -26,7 +29,7 @@ const getRGBComponents = (color: string) => {
 export const toTwoDigitString = (num: number) => {
   // num round to natural number
   const roundedNum = Math.round(num);
-  return roundedNum < 10 ? "0" + roundedNum : (roundedNum.toString());
+  return roundedNum < 10 ? "0" + roundedNum : roundedNum.toString();
 };
 
 export const randomId = () => String(Math.floor(Math.random() * 1000000));
@@ -41,16 +44,26 @@ export const secondsToHHMMSS = (sec: number) => {
   )}:${toTwoDigitString(seconds)}`;
 };
 
-const colors = ['#00AA55', '#009FD4', '#B381B3', '#939393', '#E3BC00', '#D47500', '#DC2A2A'];
+const colors = [
+  "#00AA55",
+  "#E9BC00",
+  "#DC2A2A",
+  "#FF8A00",
+  "#FFD800",
+  "#00B0FF",
+  "#086E7D",
+  "#FF99FF",
+  "#FF0080",
+];  
 
-export const numberFromText = (text: string) =>{
+export const numberFromText = (text: string) => {
   // numberFromText("AA");
   const charCodes = text
-    .split('') // => ["A", "A"]
-    .map(char => char.charCodeAt(0)) // => [65, 65]
-    .join(''); // => "6565"
+    .split("") // => ["A", "A"]
+    .map((char) => char.charCodeAt(0)) // => [65, 65]
+    .join(""); // => "6565"
   return parseInt(charCodes, 10);
-}
+};
 
 export const colorsFromText = (text: string) => {
   return colors[numberFromText(text) % colors.length];
@@ -64,6 +77,26 @@ export const HHMMToSeconds = (hhmm: string) => {
 export const secondsToHHMM = (seconds: number) => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds - hours * 3600) / 60);
-  console.log("se", seconds, hours, minutes)
   return `${toTwoDigitString(hours)}:${toTwoDigitString(minutes)}`;
-}
+};
+
+export const getWeekDays = ({ locale }: { locale: Locale }): string[] => {
+  const now = new Date();
+  const weekDays: string[] = [];
+  const start = startOfWeek(now, { locale });
+  const end = endOfWeek(now, { locale });
+  eachDayOfInterval({ start, end }).forEach((day) => {
+    weekDays.push(format(day, "EEEEEE", { locale }));
+  });
+  return weekDays;
+};
+
+//compare if dates object are equal days
+export const isDatesEqual = (date1?: Date | null, date2?: Date | null) => {
+  if (!date1 || !date2) return false;
+  return (
+    date1?.getDate() === date2?.getDate() &&
+    date1?.getMonth() === date2?.getMonth() &&
+    date1?.getFullYear() === date2?.getFullYear()
+  );
+};

@@ -1,7 +1,19 @@
-import { useState } from "react";
+import { isEmpty } from "lodash";
+import { useEffect, useState } from "react";
+import { HHMMToSeconds, secondsToHHMM } from "../../utils/basic";
 
-export const TimeInput = ({ onChange }: { onChange: (secs: number) => void }) => {
+export const TimeInput = ({
+  onChange,
+  seconds,
+}: {
+  onChange: (secs: number) => void;
+  seconds: number;
+}) => {
   const [value, setValue] = useState("0:00");
+
+  useEffect(() => {
+    setValue(secondsToHHMM(seconds));
+  }, [seconds]);
 
   const handleChange = (event: any) => {
     const value = event.target.value;
@@ -10,12 +22,6 @@ export const TimeInput = ({ onChange }: { onChange: (secs: number) => void }) =>
 
   const isNumber = (value: string) => {
     return /^\d+$/.test(value);
-  };
-
-  const minutesToHours = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const minutesLeft = minutes % 60;
-    return `${hours}:${minutesLeft < 10 ? "00" : ""}${minutesLeft}`;
   };
 
   const deleteSpaces = (value: string) => {
@@ -29,26 +35,29 @@ export const TimeInput = ({ onChange }: { onChange: (secs: number) => void }) =>
   };
 
   const onComplete = () => {
-    if (isValid(value)) return;
+    if (isValid(value)) {
+      onChange(HHMMToSeconds(value));
+      return;
+    }
     const cleanedValue = deleteSpaces(value);
     const hours = cleanedValue.match(/[0-9]+(?=h)/g);
     const minutes = isNumber(cleanedValue)
       ? Number(cleanedValue)
       : cleanedValue.match(/[0-9]+(?=m)/g);
-    if (Number(minutes) > 59) {
-      setValue(minutesToHours(Number(minutes)));
+    if (isEmpty(hours) && Number(minutes) > 59) {
+      setValue(secondsToHHMM((Number(hours)*60 + Number(minutes))*60));
       return;
     }
-    onChange(Number(hours) * 3600 + Number(minutes)*60);
+    onChange(Number(hours) * 3600 + Number(minutes) * 60);
     setValue(`${hours || "00"}:${minutes || "00"}`);
-  }
+  };
 
   const onBlur = () => {
     onComplete();
   };
 
-  const handleKeyDown = (e: { key: string; }) => {
-    if (e.key === 'Enter') {
+  const handleKeyDown = (e: { key: string }) => {
+    if (e.key === "Enter") {
       onComplete();
     }
   };
@@ -64,6 +73,5 @@ export const TimeInput = ({ onChange }: { onChange: (secs: number) => void }) =>
       />
       <p className="text-xs mt-1">Example: 1h 20m or 01:20</p>
     </div>
-
   );
 };

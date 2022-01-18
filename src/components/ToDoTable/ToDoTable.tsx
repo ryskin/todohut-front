@@ -1,7 +1,6 @@
-import { PlayIcon, FlagIcon } from "@heroicons/react/solid";
+import { FlagIcon } from "@heroicons/react/solid";
 import {
   CalendarIcon,
-  ClockIcon,
   ViewGridAddIcon,
   ReplyIcon,
   FolderAddIcon,
@@ -18,11 +17,15 @@ import { useStore } from "../../models/StoreContext";
 import { AddTaskStatusForm } from "../AddTaskStatusForm/AddTaskStatusForm";
 import { getIdealTextColor } from "../../utils/basic";
 import { Modal } from "../Modal";
-import { Popover } from "../Popover";
-import { TimeInput } from "../TimeInput/TimeInput";
 import { TimerCell } from "../TimerCell/TimerCell";
 import { UsersPopover } from "../UsersPopover/UsersPopover";
 import { TimeEstimateCell } from "../TimeEstimateCell";
+import { Popover } from "../Popover";
+import { DatePicker } from "../DatePicker";
+import { formatDistanceToNowStrict, isToday, isTomorrow } from "date-fns";
+import { PriorityPopover } from "../PriorityPopover";
+import { useRef } from "react";
+import { TaskMenu } from "../TaskMenu/TaskMenu";
 
 type GropedTasks = {
   [key: string]: Task[] | any;
@@ -34,6 +37,7 @@ export const ToDoTable = observer(() => {
     taskStatus: taskStatusStore,
     list: listStore,
   } = useStore();
+  const outerRef = useRef(null);
 
   const groupedTasksByStatus = taskStore.parents
     .filter((task) => task?.list?.id === listStore?.selected?.id)
@@ -132,9 +136,12 @@ export const ToDoTable = observer(() => {
       Header: "Time estimate",
       accessor: "timeEstimate",
       disableFilters: true,
-      Cell: ({ value, row: { original: { id } } }: CellProps<Task>) => (
-        <TimeEstimateCell taskId={id} value={value} />
-      ),
+      Cell: ({
+        value,
+        row: {
+          original: { id },
+        },
+      }: CellProps<Task>) => <TimeEstimateCell taskId={id} value={value} />,
     },
     {
       Header: "Time tracked",
@@ -157,21 +164,52 @@ export const ToDoTable = observer(() => {
       Header: "Due date",
       accessor: "dueDate",
       disableFilters: true,
-      Cell: ({ value }: CellProps<any>) => (
-        <div className="flex">
-          <CalendarIcon className="w-4 h-4 text-gray-400" /> {value || ""}
-        </div>
-      ),
+      Cell: ({ value, row }: CellProps<any>) => {
+        const onChange = (date: Date) => {
+          taskStore.update(row.original.id, { dueDate: date });
+        };
+        const now = new Date();
+        const isPast = now > value;
+
+        return (
+          <div className="flex">
+            <Popover
+              clickComponent={
+                <div
+                  className={`${
+                    isPast ? "text-red-600" : "text-gray-400"
+                  } flex text-xs`}
+                >
+                  {!value && <CalendarIcon className="w-4 h-4 text-gray-400" />}
+                  {isToday(value) && "Today"}
+                  {isTomorrow(value) && "Tomorrow"}
+                  {value &&
+                    !isToday(value) &&
+                    !isTomorrow(value) &&
+                    formatDistanceToNowStrict(value, {
+                      addSuffix: true,
+                      unit: "day",
+                    })}
+                </div>
+              }
+            >
+              <>
+                <DatePicker value={value} onChange={onChange} />
+              </>
+            </Popover>
+          </div>
+        );
+      },
     },
     {
       Header: "Priority",
       accessor: "priority",
       disableFilters: true,
-      Cell: ({ value }: CellProps<any>) => (
-        <div className="flex">
-          <FlagIcon className="w-4 h-4 text-gray-400" />
-        </div>
-      ),
+      Cell: ({
+        row: {
+          original: { id },
+        },
+      }: CellProps<any>) => <PriorityPopover taskId={id} />,
     },
     {
       id: "actions",
@@ -182,7 +220,8 @@ export const ToDoTable = observer(() => {
   ];
 
   return (
-    <div className="p-4">
+    <div className="p-4" ref={outerRef}>
+      <TaskMenu outerRef={outerRef} />
       {taskStatusStore.statuses.length === 0 && (
         <div>
           <AddTaskStatusForm>"No statuses, create first."</AddTaskStatusForm>
@@ -199,7 +238,7 @@ export const ToDoTable = observer(() => {
 
         if (!statusId) return "Cтатус не найден";
         return (
-          <div className="mb-4">
+          <div className="mb-4" key={status}>
             <div className="flex flex-row">
               <div
                 style={{ backgroundColor: statusColor }}
