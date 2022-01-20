@@ -15,8 +15,8 @@ export const TimerCell = observer(({ taskId }: { taskId: string }) => {
   },[currentTime, store.timeLog, taskId]);
 
   useEffect(() => {
-    store.timeLog.currentTimer?.task.id === taskId  && setActive(true);
-    store.timeLog.currentTimer?.task.id !== taskId  && setActive(false);
+    store.timeLog.currentTimer?.task?.id === taskId  && setActive(true);
+    store.timeLog.currentTimer?.task?.id !== taskId  && setActive(false);
   }, [store.timeLog.currentTimer, taskId]);
 
   const handleStart = () => {

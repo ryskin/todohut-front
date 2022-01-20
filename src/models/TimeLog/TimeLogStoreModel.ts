@@ -8,7 +8,7 @@ export const TimeLogStoreModel = types.model("TimeLogStore", {
   .actions(self => ({
     taskDuration(taskId: string) {
       return self.items.reduce((acc, item) => {
-        if (item.task.id === taskId) {
+        if (item?.task?.id === taskId) {
           acc += item.duration;
         }
         return acc;
@@ -33,10 +33,10 @@ export const TimeLogStoreModel = types.model("TimeLogStore", {
       return currentDuration;
     },
     stop({ taskId }: { taskId: string }) {
-      const timeLog = self.items.find(item => item.task.id === taskId && !item.endTime);
+      const timeLog = self.items.find(item => item?.task?.id === taskId && !item.endTime);
       if (!timeLog) return;
       timeLog?.stop();
       self.currentTimer = undefined;
-      return this.taskDuration(timeLog?.task?.id);
+      return this.taskDuration(timeLog?.task?.id || "");
     },
   }))

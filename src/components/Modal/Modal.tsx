@@ -7,11 +7,13 @@ export const Modal = ({
   children,
   clickComponent,
   closeFromParent,
+  classNameWrapper,
 }: {
   title: string;
   children: JSX.Element;
   clickComponent?: any;
   closeFromParent?: boolean;
+  classNameWrapper?: string;
 }) => {
   let [isOpen, setIsOpen] = useState(false);
 
@@ -32,9 +34,9 @@ export const Modal = ({
   };
 
   return (
-    <div>
+    <>
       {clickComponent ? (
-        <div onClick={handleOpen}>{clickComponent}</div>
+        <div className={classNameWrapper} onClick={handleOpen}>{clickComponent}</div>
       ) : (
         <button
           type="button"
@@ -96,6 +98,6 @@ export const Modal = ({
           </Dialog>
         </div>
       </Transition>
-    </div>
+    </>
   );
 };

@@ -50,8 +50,10 @@ export const ToDoTable = observer(() => {
       }
       acc[statusName].push({
         ...task,
+
         subRows: task?.subTasks.map((task) => ({
           ...task,
+          subRow: true,
           subRows: task?.subTasks,
         })),
       });
@@ -112,15 +114,25 @@ export const ToDoTable = observer(() => {
       Header: "Name",
       accessor: "name",
       disableFilters: true,
-      Cell: ({ row, value }: CellProps<Task>) => (
-        <div className="flex flex-row items-center font-semibold text-gray-700">
-          <div>{value}</div>
-          <div className="ml-1" />
-          <div>
+      Cell: ({ row, value }: CellProps<any>) => {
+        const handleNameClick = () => {
+          alert(value);
+        };
+        return (
+          <div className={"block text-gray-700 max-w-2xl"}>
+            <span
+              onDoubleClick={handleNameClick}
+              className={`${
+                row.original.subRow ? "font-semibold" : "font-bold"
+              } inline whitespace-normal`}
+            >
+              {value}
+            </span>
             <Modal
               title={`Add task ${`to ${row.original.name}`}`}
+              classNameWrapper="inline"
               clickComponent={
-                <ViewGridAddIcon className="w-3 h-3 text-gray-400 cursor-pointer" />
+                <ViewGridAddIcon className="inline w-3 h-3 text-gray-400 cursor-pointer ml-1" />
               }
             >
               <AddTaskForm
@@ -129,8 +141,8 @@ export const ToDoTable = observer(() => {
               />
             </Modal>
           </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       Header: "Time estimate",

@@ -5,7 +5,7 @@ import { UserModel } from "../User/UserModel";
 export const TimeLogModel = types
     .model("TimeLog", {
         id: types.identifier,
-        task: types.reference(types.late(() => TaskModel)),
+        task: types.safeReference(types.late(() => TaskModel)),
         user: types.maybe(types.reference(types.late(() => UserModel))),
         startTime: types.Date,
         endTime: types.maybe(types.Date),

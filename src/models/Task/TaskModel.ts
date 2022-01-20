@@ -15,7 +15,7 @@ export const TaskModel = types
   .model("TaskStore", {
     id: types.identifier,
     parent: types.maybe(
-      types.reference(types.late((): IAnyModelType => TaskModel))
+      types.safeReference(types.late((): IAnyModelType => TaskModel))
     ),
     name: types.string,
     description: types.maybe(types.string),
@@ -74,6 +74,9 @@ export const TaskModel = types
       return getRoot<RootStore>(self).task.items.filter(
         (task) => task.parent?.id === self.id
       );
+    },
+    get hasParent(): boolean {
+      return Boolean(self.parent);
     },
     get timeTracked(): number {
       const timeLog = getRoot<RootStore>(self).timeLog;

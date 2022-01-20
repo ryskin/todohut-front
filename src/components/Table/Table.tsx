@@ -19,7 +19,6 @@ import {
   usePagination,
   useRowSelect,
 } from "react-table";
-import { AddTaskForm } from "../AddTaskForm/AddTaskForm";
 import { EditableCell } from "./components/EditableCell";
 import { DefaultColumnFilter } from "./components/filters/DefaultColumnFilter";
 import { fuzzyTextFilterFn } from "./utils/filters";

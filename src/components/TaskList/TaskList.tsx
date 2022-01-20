@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import React, { useEffect } from "react";
 import { useStore } from "../../models/StoreContext";
-import { TaskItem } from "../../layout/TasksLayout/TasksLayout";
+import { TaskItem } from "../../pages/TasksPage/TasksLayout";
 
 
 export const TaskList = observer(() => {

@@ -1,7 +1,8 @@
 import { useRoutes } from "react-router-dom";
 import { GanttPage } from "./components/GanttPage";
+import { UsersPage } from "./pages/UsersPage";
 import { MainLayout } from "./layout/MainLayout";
-import { TasksLayout } from "./layout/TasksLayout";
+import { TasksLayout } from "./pages/TasksPage";
 import { createStore } from "./models/RootStore";
 import { StoreProvider } from "./models/StoreContext";
 import "./tailwind.css";
@@ -18,6 +19,10 @@ const routes = [{
       element: <GanttPage />,
       path: "/gantt",
     },
+  {
+    element: <UsersPage />,
+    path: "/users",
+  },
   ]
 }];
 
