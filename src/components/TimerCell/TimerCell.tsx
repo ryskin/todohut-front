@@ -35,6 +35,7 @@ export const TimerCell = observer(({ taskId }: { taskId: string }) => {
       handleStop={handleStop}
       handleStart={handleStart}
       active={active}
+      id={taskId}
     />
   );
 });

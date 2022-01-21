@@ -27,7 +27,7 @@ const routes = [{
 }];
 
 
-const App = () => {
+export const App = () => {
   const rootStore = createStore();
   const routing = useRoutes(routes);
 
@@ -39,5 +39,3 @@ const App = () => {
     </StoreProvider>
   );
 };
-
-export default App;

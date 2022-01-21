@@ -53,7 +53,6 @@ export const TaskModel = types
     },
     changeStatus(statusId: string) {
       const statusInstance = getRoot<RootStore>(self).taskStatus.findById(statusId);
-      console.log(statusInstance);
       if (statusInstance) {
         self.status = statusInstance;
         return self.status;

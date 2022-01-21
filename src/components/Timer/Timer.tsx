@@ -8,9 +8,10 @@ type TimerProps = {
   handleStop: () => void;
   handleStart: () => void;
   active: boolean;
+  id: string;
 };
 
-export const Timer = ({ currentTimer, handleStop, handleStart, active }: TimerProps) => {
+export const Timer = ({ currentTimer, handleStop, handleStart, active, id }: TimerProps) => {
   const [counter, start, pause, , status] = useTimer(currentTimer, active);
 
   useEffect(() => {

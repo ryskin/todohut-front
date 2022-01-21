@@ -5,7 +5,7 @@ import { secondsToHHMM } from "../../utils/basic";
 import { Popover } from "../Popover";
 import { TimeInput } from "../TimeInput/TimeInput";
 
-export const TimeEstimateCell = observer(({ taskId, value }: { taskId: string, value: string }) => {
+export const TimeEstimateCell = observer(({ taskId }: { taskId: string }) => {
   const store = useStore();
   const task = store.task.findById(taskId);
   const seconds = task?.timeEstimate ?? 0;
@@ -17,7 +17,7 @@ export const TimeEstimateCell = observer(({ taskId, value }: { taskId: string, v
           <div className="flex items-center">
             <ClockIcon className="w-4 h-4 text-gray-400 cursor-pointer" />{" "}
             <div className="mr-0.5"></div>
-            <div className="text-gray-500 text-xs">{secondsToHHMM(Number(value)) || ""}</div>
+            <div className="text-gray-500 text-xs">{secondsToHHMM(Number(seconds)) || ""}</div>
           </div>
         }
       >

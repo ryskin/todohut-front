@@ -20,6 +20,7 @@ export const RootStoreModel = types.model("RootStore", {
 .extend(
   localStorageMixin({
     throttle: 1000,
+    filter: ["task", "list", "taskStatus", "taskToTask", "timeLog", "user", "comment"],
   })
 );
 

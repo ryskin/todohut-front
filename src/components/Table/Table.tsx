@@ -119,6 +119,7 @@ export const Table = ({
       // for creating columns during render.
       autoResetHiddenColumns: false,
       autoResetResize: false,
+      autoResetExpanded: false,
     },
     useFilters,
     useGroupBy,

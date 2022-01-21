@@ -24,7 +24,7 @@ import { Popover } from "../Popover";
 import { DatePicker } from "../DatePicker";
 import { formatDistanceToNowStrict, isToday, isTomorrow } from "date-fns";
 import { PriorityPopover } from "../PriorityPopover";
-import { useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { TaskMenu } from "../TaskMenu/TaskMenu";
 
 type GropedTasks = {
@@ -39,7 +39,7 @@ export const ToDoTable = observer(() => {
   } = useStore();
   const outerRef = useRef(null);
 
-  const groupedTasksByStatus = taskStore.parents
+  const groupedTasksByStatus = useCallback(() => taskStore.parents
     .filter((task) => task?.list?.id === listStore?.selected?.id)
     .reduce((acc: GropedTasks, task) => {
       const {
@@ -58,20 +58,17 @@ export const ToDoTable = observer(() => {
         })),
       });
       return acc;
-    }, {});
+    }, {}), [listStore?.selected?.id, taskStore.parents]);
 
-  const columns = [
+  const columns = useMemo(() => [
     {
-      // Build our expander column
-      id: "expander", // Make sure it has an ID
-      // Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }: any) => (
-      //   <span {...getToggleAllRowsExpandedProps()}>
-      //     {isAllRowsExpanded ? '👇' : }
-      //   </span>
-      // ),
+      id: "id",
+      Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }: any) => (
+        <span {...getToggleAllRowsExpandedProps()}>
+          {isAllRowsExpanded ? '👇' : "👉"}
+        </span>
+      ),
       Cell: ({ row }: CellProps<any>) =>
-        // Use the row.canExpand and row.getToggleRowExpandedProps prop getter
-        // to build the toggle for expanding a row
         row.canExpand ? (
           <div
             {...row.getToggleRowExpandedProps({
@@ -122,9 +119,8 @@ export const ToDoTable = observer(() => {
           <div className={"block text-gray-700 max-w-2xl"}>
             <span
               onDoubleClick={handleNameClick}
-              className={`${
-                row.original.subRow ? "font-semibold" : "font-bold"
-              } inline whitespace-normal`}
+              className={`${row.original.subRow ? "font-semibold" : "font-bold"
+                } inline whitespace-normal`}
             >
               {value}
             </span>
@@ -153,7 +149,7 @@ export const ToDoTable = observer(() => {
         row: {
           original: { id },
         },
-      }: CellProps<Task>) => <TimeEstimateCell taskId={id} value={value} />,
+      }: CellProps<Task>) => <TimeEstimateCell taskId={id} />,
     },
     {
       Header: "Time tracked",
@@ -188,9 +184,8 @@ export const ToDoTable = observer(() => {
             <Popover
               clickComponent={
                 <div
-                  className={`${
-                    isPast ? "text-red-600" : "text-gray-400"
-                  } flex text-xs`}
+                  className={`${isPast ? "text-red-600" : "text-gray-400"
+                    } flex text-xs`}
                 >
                   {!value && <CalendarIcon className="w-4 h-4 text-gray-400" />}
                   {isToday(value) && "Today"}
@@ -229,7 +224,8 @@ export const ToDoTable = observer(() => {
         <DotsHorizontalIcon className="cursor-pointer h-5 w-5 text-gray-100" />
       ),
     },
-  ];
+  ], [taskStore]);
+
 
   return (
     <div className="p-4" ref={outerRef}>
@@ -240,7 +236,7 @@ export const ToDoTable = observer(() => {
         </div>
       )}
       {taskStatusStore.statuses.map((status: string) => {
-        const tasks = groupedTasksByStatus[status];
+        const tasks = groupedTasksByStatus()[status] || [];
         const statusId = taskStatusStore.items.find(
           (statusObj) => statusObj.name === status
         )?.id;
@@ -267,7 +263,7 @@ export const ToDoTable = observer(() => {
                 </div>
               </div>
             </div>
-            <Table columns={columns} data={tasks ? [...tasks] : []} />
+            <Table columns={columns} data={tasks} />
             <AddTaskForm statusId={statusId} />
             <div className="text-xs text-gray-500 mt-1 ml-3">+ New task</div>
           </div>
