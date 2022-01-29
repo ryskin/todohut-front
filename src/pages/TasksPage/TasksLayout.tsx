@@ -1,15 +1,27 @@
 import { DocumentTextIcon, SearchIcon } from "@heroicons/react/solid";
 import { observer } from "mobx-react-lite";
-import React from "react";
+import Editor from "rich-markdown-editor";
 import { AddListForm } from "../../components/AddListForm/AddListForm";
 import { ToDoTable } from "../../components/ToDoTable";
 import { useStore } from "../../models/StoreContext";
 import mainImage from "../../assets/main.png";
+import { light } from "rich-markdown-editor/dist/styles/theme";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
 type ITaskItem = {
   id: string;
   name: string;
   list: any;
+};
+
+const Tiptap = () => {
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: "<p>Hello World!</p>",
+  });
+
+  return <EditorContent editor={editor} />;
 };
 
 export const TaskItem = (task: ITaskItem) => {
@@ -71,8 +83,9 @@ const ListItem = ({
     <div
       id={id}
       onClick={onClickHandler}
-      className={`${selected ? "bg-blue-200" : "bg-white"
-        } flex mb-2 flex-row p-2 cursor-pointer justify-between items-center rounded-xl border-b gray-600 text-sm`}
+      className={`${
+        selected ? "border-l-blue-500 border-l-4 " : ""
+      } flex flex-row p-2 cursor-pointer justify-between items-center border-b bg-white gray-600 text-sm`}
     >
       <div className="flex flex-row items-center pointer-events-none">
         <DocumentTextIcon className="w-5 h-5 ml-2 mr-2 text-blue-500" />
@@ -84,7 +97,6 @@ const ListItem = ({
     </div>
   );
 };
-
 
 const ListItems = observer(() => {
   const store = useStore();
@@ -113,13 +125,18 @@ const ListItems = observer(() => {
 export const TasksLayout = observer(() => {
   const store = useStore();
 
+  const handleChangeDescrtiption = (data: any) => {
+    const text = data();
+    store?.list?.selected?.setDescription(text);
+  };
+
   return (
     <>
-      <div className="w-64 bg-gray-100 p-4 flex flex-col space-y-4">
+      <div className="w-64 bg-gray-100 flex flex-col space-y-4">
         <div>
-          <div className="flex flex-row justify-between items-center mb-6">
+          <div className="flex flex-row justify-between items-center p-4 mb-2">
             <h1 className="flex-auto font-semibold text-xl">Lists</h1>
-            <SearchIcon className="w-5 h-5 flex-none" />
+            {/* <SearchIcon className="w-5 h-5 flex-none" /> */}
           </div>
           <ListItems />
           <div className="">
@@ -127,9 +144,22 @@ export const TasksLayout = observer(() => {
           </div>
         </div>
       </div>
-      <div className="flex-auto bg-gray-50 border-l rounded-tl-xl shadow-2xl p4">
+      <div className="flex-auto bg-gray-50 border-l rounded-tl-xl shadow-2xl">
         <div className="p-6">
-          {store.list.selected ? <ToDoTable/> : <img src={mainImage} alt=""/>}
+          {/* <div className="flex flex-row justify-between items-center p-4">
+            <h1 className="flex-auto font-semibold text-xl">{store?.list.selected?.name}</h1>
+          </div> */}
+          {
+            <div className="p-4 bg-gray-50">
+              <Editor
+                theme={{ ...light, background: "rgb(249 250 251)" }}
+                onChange={handleChangeDescrtiption}
+                // onChange={(value: any) => {store?.list?.selected?.setDescription(value())}}
+                defaultValue={store?.list?.selected?.description}
+              />
+            </div>
+          }
+          {store.list.selected ? <ToDoTable /> : <img src={mainImage} alt="" />}
         </div>
       </div>
     </>

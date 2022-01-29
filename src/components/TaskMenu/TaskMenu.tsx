@@ -7,11 +7,12 @@ export const TaskMenu = ({ outerRef }: any) => {
   const store = useStore();
   const { xPos, yPos, menu, event } = useContextMenu(outerRef);
 
-  const id = event?.path?.[3].id;
+  const id = event?.path?.[3]?.id;
 
   const task = store.task.findById(id);
 
   const handleDelete = () => {
+    if (!id) return;
     store.task.remove(id);
   };
 

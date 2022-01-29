@@ -16,4 +16,10 @@ export const ListModel = types
         (task) => task.list?.id === self.id
       );
     },
+  }))
+  .actions((self) => ({
+    setDescription(description: string) {
+      console.log("setDescription", description);
+      self.description = description;
+    }
   }));
