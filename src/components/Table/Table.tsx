@@ -1,5 +1,5 @@
 /* eslint-disable no-empty-pattern */
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Cell,
   CellProps,
@@ -22,6 +22,9 @@ import {
 import { EditableCell } from "./components/EditableCell";
 import { DefaultColumnFilter } from "./components/filters/DefaultColumnFilter";
 import { fuzzyTextFilterFn } from "./utils/filters";
+import update from "immutability-helper";
+import { useDrag, useDrop, XYCoord } from "react-dnd";
+import { DotsVerticalIcon } from "@heroicons/react/outline";
 
 export interface Data {
   firstName: string;
@@ -46,6 +49,16 @@ export const Table = ({
   updateMyData,
   skipPageReset = false,
 }: ITable<any>) => {
+  const [records, setRecords] = useState(data);
+
+  const getRowId = useCallback((row) => {
+    return row.id;
+  }, []);
+
+  useEffect(() => {
+    setRecords(data);
+  }, [data]);
+
   const filterTypes = useMemo(
     () => ({
       // Add a new fuzzyTextFilterFn filter type.
@@ -61,8 +74,8 @@ export const Table = ({
           const rowValue = row.values[ids[0]];
           return rowValue !== undefined
             ? String(rowValue)
-              .toLowerCase()
-              .startsWith(String(filterValue).toLowerCase())
+                .toLowerCase()
+                .startsWith(String(filterValue).toLowerCase())
             : true;
         });
       },
@@ -101,7 +114,7 @@ export const Table = ({
   } = useTable<any>(
     {
       columns,
-      data,
+      data: records,
       defaultColumn,
       filterTypes,
       // nestExpandedRows: true,
@@ -120,6 +133,7 @@ export const Table = ({
       autoResetHiddenColumns: false,
       autoResetResize: false,
       autoResetExpanded: false,
+      getRowId,
     },
     useFilters,
     useGroupBy,
@@ -155,9 +169,27 @@ export const Table = ({
             </div>
           ),
         },
+
         ...columns,
       ]);
     }
+  );
+
+  const moveRow = useCallback(
+    (dragIndex, hoverIndex) => {
+      const dragCard = records[dragIndex];
+      const dropCard = records[hoverIndex];
+      console.log(dragCard, dropCard);
+      setRecords(
+        update(records, {
+          $splice: [
+            [dragIndex, 1],
+            [hoverIndex, 0, dragCard],
+          ],
+        })
+      );
+    },
+    [records]
   );
 
   // Render the UI for your table
@@ -170,6 +202,7 @@ export const Table = ({
         <thead className="bg-gray-50">
           {headerGroups.map((headerGroup: HeaderGroup<any>) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
+              <th></th>
               {headerGroup.headers.map((column) => {
                 // $ExpectType TableHeaderProps
                 const headerProps = column.getHeaderProps();
@@ -220,11 +253,18 @@ export const Table = ({
           {...getTableBodyProps()}
           className="bg-white divide-y divide-gray-200"
         >
-          {page.map((row: Row<any>) => {
+          {page.map((row: Row<any>, index) => {
             prepareRow(row);
             return (
               <>
-                <tr
+                <RowItems
+                  index={index}
+                  moveRow={moveRow}
+                  row={row}
+                  itemId={row?.original?.id}
+                  {...row.getRowProps()}
+                />
+                {/* <tr
                   {...row.getRowProps()}
                   className="bg-gradient-to-t from-gray-50 to-white hover:from-white-500 hover:to-blue-50"
                   id={row?.original?.id}
@@ -255,14 +295,6 @@ export const Table = ({
                       </td>
                     );
                   })}
-                </tr>
-                {/* <tr>
-                  <td colSpan={row.cells.length+1}>
-                    <AddTaskForm
-                      parentId={row.original.id}
-                      statusId={row.original.status.id}
-                    />
-                  </td>
                 </tr> */}
               </>
             );
@@ -340,5 +372,99 @@ export const Table = ({
         </code>
       </pre> */}
     </>
+  );
+};
+
+const TASK = "task";
+const SUB_TASK = "subTask";
+
+const RowItems = ({ row, index, moveRow, itemId }: any) => {
+  const dropRef = useRef<any>(null);
+  const dragRef = useRef<any>(null);
+
+  const type = row.original.parent ? SUB_TASK : TASK
+
+  const [, drop] = useDrop({
+    accept: type,
+
+    hover(item: any, monitor) {
+      if (!dropRef.current) {
+        return;
+      }
+      const dragIndex = item.index;
+      const hoverIndex = index;
+      console.log(dragIndex, hoverIndex);
+      // Don't replace items with themselves
+      if (dragIndex === hoverIndex) {
+        return;
+      }
+      // Determine rectangle on screen
+      const hoverBoundingRect = dropRef.current.getBoundingClientRect();
+      // Get vertical middle
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      // Determine mouse position
+      const clientOffset = monitor.getClientOffset();
+      // Get pixels to the top
+      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
+      // Only perform the move when the mouse has crossed half of the items height
+      // When dragging downwards, only move when the cursor is below 50%
+      // When dragging upwards, only move when the cursor is above 50%
+      // Dragging downwards
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+        return;
+      }
+      // Dragging upwards
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+        return;
+      }
+      // Time to actually perform the action
+      console.log("type", type)
+      moveRow(dragIndex, hoverIndex);
+      // Note: we're mutating the monitor item here!
+      // Generally it's better to avoid mutations,
+      // but it's good here for the sake of performance
+      // to avoid expensive index searches.
+      item.index = hoverIndex;
+    },
+  });
+
+  const [{ isDragging }, drag, preview] = useDrag({
+    type: type,
+    item: { itemId, index },
+    isDragging: (monitor) => {
+      return monitor.getItem().itemId === itemId;
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  console.log(row.original.parent);
+
+  const opacity = isDragging ? 0 : 1;
+
+  preview(drop(dropRef));
+  drag(dragRef);
+
+  return (
+    <tr ref={dropRef} style={{ opacity }}>
+      {!row.original.parent ? <td
+        ref={dragRef}
+        className="flex flex-row text-sm py-2 text-gray-200 items-center justify-center"
+      >
+        <DotsVerticalIcon className="w-6 h-6" />
+      </td> : <td></td>}
+      {row.cells.map((cell: Cell<any>) => {
+        return (
+          <td
+            className="text-sm font-light px-3 py-2 whitespace-nowrap"
+            {...cell.getCellProps()}
+          >
+            {cell.render("Cell")}
+          </td>
+        );
+      })}
+    </tr>
   );
 };

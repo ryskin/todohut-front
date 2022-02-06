@@ -6,26 +6,29 @@ import { TasksLayout } from "./pages/TasksPage";
 import { createStore } from "./models/RootStore";
 import { StoreProvider } from "./models/StoreContext";
 import "./tailwind.css";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
-const routes = [{
-  element: <MainLayout />,
-  path: "/",
-  children: [
-    {
-      element: <TasksLayout />,
-      path: "/",
-    },
-    {
-      element: <GanttPage />,
-      path: "/gantt",
-    },
+const routes = [
   {
-    element: <UsersPage />,
-    path: "/users",
+    element: <MainLayout />,
+    path: "/",
+    children: [
+      {
+        element: <TasksLayout />,
+        path: "/",
+      },
+      {
+        element: <GanttPage />,
+        path: "/gantt",
+      },
+      {
+        element: <UsersPage />,
+        path: "/users",
+      },
+    ],
   },
-  ]
-}];
-
+];
 
 export const App = () => {
   const rootStore = createStore();
@@ -35,7 +38,7 @@ export const App = () => {
 
   return (
     <StoreProvider value={rootStore}>
-      {routing}
+      <DndProvider backend={HTML5Backend}>{routing}</DndProvider>
     </StoreProvider>
   );
 };

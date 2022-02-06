@@ -77,7 +77,6 @@ export const ToDoTable = observer(() => {
           row.canExpand ? (
             <div
               {...row.getToggleRowExpandedProps({
-                // className: "ml-2",
                 style: {
                   paddingLeft: `${row.depth * 0.5}rem`,
                 },
