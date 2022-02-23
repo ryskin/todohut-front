@@ -8,6 +8,7 @@ import { StoreProvider } from "./models/StoreContext";
 import "./tailwind.css";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { TaskViewPage } from "./pages/TaskViewPage";
 
 const routes = [
   {
@@ -17,7 +18,17 @@ const routes = [
       {
         element: <TasksLayout />,
         path: "/",
+        children: [
+          {
+            path: "/tasks/:taskId",
+            element: <TaskViewPage />,
+          },
+        ]
       },
+      // {
+      //   path: "/tasks/:taskId",
+      //   element: <TaskViewPage />,
+      // },
       {
         element: <GanttPage />,
         path: "/gantt",

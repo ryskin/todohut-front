@@ -1,5 +1,4 @@
 import { ServerIcon, TrashIcon } from "@heroicons/react/outline";
-import React from "react";
 import { useContextMenu } from "../../hooks/useContextMenu";
 import { useStore } from "../../models/StoreContext";
 
@@ -7,10 +6,10 @@ export const TaskMenu = ({ outerRef }: any) => {
   const store = useStore();
   const { xPos, yPos, menu, event } = useContextMenu(outerRef);
 
-  const id = event?.path?.[3]?.id;
+  const id = event?.path?.[4]?.id;
 
   const task = store.task.findById(id);
-
+  console.log("id", id, event?.path.map((el: any) => el));
   const handleDelete = () => {
     if (!id) return;
     store.task.remove(id);

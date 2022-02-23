@@ -17,5 +17,8 @@ export const ListStoreModel = types.model("ListStore", {
     },
     setCurrentList(itemId: string) {
       self.selected = self.items.find(item => item.id === itemId);
-    }
+    },
+    findById(id: string) {
+      return self.items.find((item) => item.id === id);
+    },
   }))

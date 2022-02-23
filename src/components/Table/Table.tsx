@@ -448,7 +448,7 @@ const RowItems = ({ row, index, moveRow, itemId }: any) => {
   drag(dragRef);
 
   return (
-    <tr ref={dropRef} style={{ opacity }}>
+    <tr ref={dropRef} style={{ opacity }} id={row?.original?.id}>
       {!row.original.parent ? <td
         ref={dragRef}
         className="flex flex-row text-sm py-2 text-gray-200 items-center justify-center"

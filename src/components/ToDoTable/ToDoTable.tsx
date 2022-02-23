@@ -26,6 +26,7 @@ import { formatDistanceToNowStrict, isToday, isTomorrow } from "date-fns";
 import { PriorityPopover } from "../PriorityPopover";
 import { useCallback, useMemo, useRef } from "react";
 import { TaskMenu } from "../TaskMenu/TaskMenu";
+import { Link } from "react-router-dom";
 
 type GropedTasks = {
   [key: string]: Task[] | any;
@@ -121,14 +122,16 @@ export const ToDoTable = observer(() => {
           };
           return (
             <div className={"block text-gray-700 max-w-2xl"}>
-              <span
-                onDoubleClick={handleNameClick}
-                className={`${
-                  row.original.subRow ? "font-semibold" : "font-bold"
-                } inline whitespace-normal`}
-              >
-                {value}
-              </span>
+              <Link to={`tasks/${row.original.id}`}>
+                <span
+                  onDoubleClick={handleNameClick}
+                  className={`${
+                    row.original.subRow ? "font-semibold" : "font-bold"
+                  } inline whitespace-normal`}
+                >
+                  {value}
+                </span>
+              </Link>
               <Modal
                 title={`Add task ${`to ${row.original.name}`}`}
                 classNameWrapper="inline"

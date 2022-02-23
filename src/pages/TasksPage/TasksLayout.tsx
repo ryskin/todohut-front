@@ -8,20 +8,14 @@ import mainImage from "../../assets/main.png";
 import { light } from "rich-markdown-editor/dist/styles/theme";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { Outlet } from "react-router-dom";
+import { ListContextMenu } from "../../components/ListContextMenu";
+import { useRef } from "react";
 
 type ITaskItem = {
   id: string;
   name: string;
   list: any;
-};
-
-const Tiptap = () => {
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: "<p>Hello World!</p>",
-  });
-
-  return <EditorContent editor={editor} />;
 };
 
 export const TaskItem = (task: ITaskItem) => {
@@ -101,13 +95,15 @@ const ListItem = ({
 const ListItems = observer(() => {
   const store = useStore();
   const { list } = store;
+  const outerRef = useRef(null);
 
   const handleListItemClick = (listId: string) => {
     list.setCurrentList(listId);
   };
 
   return (
-    <div>
+    <div ref={outerRef}>
+      <ListContextMenu outerRef={outerRef} />
       {list.items.map((listItem) => (
         <ListItem
           name={listItem.name}
@@ -125,18 +121,18 @@ const ListItems = observer(() => {
 export const TasksLayout = observer(() => {
   const store = useStore();
 
-  const handleChangeDescrtiption = (data: any) => {
+  const handleChangeDescription = (data: any) => {
     const text = data();
     store?.list?.selected?.setDescription(text);
   };
 
   return (
     <>
+      <Outlet/>
       <div className="w-64 bg-gray-100 flex flex-col space-y-4">
         <div>
           <div className="flex flex-row justify-between items-center p-4 mb-2">
             <h1 className="flex-auto font-semibold text-xl">Lists</h1>
-            {/* <SearchIcon className="w-5 h-5 flex-none" /> */}
           </div>
           <ListItems />
           <div className="">
@@ -146,15 +142,11 @@ export const TasksLayout = observer(() => {
       </div>
       <div className="flex-auto bg-gray-50 border-l rounded-tl-xl shadow-2xl">
         <div className="p-6">
-          {/* <div className="flex flex-row justify-between items-center p-4">
-            <h1 className="flex-auto font-semibold text-xl">{store?.list.selected?.name}</h1>
-          </div> */}
           {
             <div className="p-4 bg-gray-50">
               <Editor
                 theme={{ ...light, background: "rgb(249 250 251)" }}
-                onChange={handleChangeDescrtiption}
-                // onChange={(value: any) => {store?.list?.selected?.setDescription(value())}}
+                onChange={handleChangeDescription}
                 defaultValue={store?.list?.selected?.description}
               />
             </div>
