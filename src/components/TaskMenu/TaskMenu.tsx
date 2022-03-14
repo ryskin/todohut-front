@@ -11,7 +11,10 @@ export const TaskMenu = ({ outerRef }: any) => {
   const task = store.task.findById(id);
   console.log("id", id, event?.path.map((el: any) => el));
   const handleDelete = () => {
-    if (!id) return;
+    if (!id) {
+      alert("No task selected");
+      return
+    };
     store.task.remove(id);
   };
 

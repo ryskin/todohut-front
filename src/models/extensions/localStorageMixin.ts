@@ -35,6 +35,8 @@ export function localStorageMixin(options: LocalStorageMixinOptions = {}) {
             return;
           }
           applySnapshot(self, json);
+          self.setRehydrated();
+          console.log("Loaded data from local storage", self);
         }
         addDisposer(
           self,

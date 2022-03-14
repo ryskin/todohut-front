@@ -1,4 +1,5 @@
-import { types } from "mobx-state-tree";
+import { types, getRoot } from "mobx-state-tree";
+import { RootStore } from "../RootStoreModel";
 import { TimeLogModel } from "./TimeLogModel";
 
 export const TimeLogStoreModel = types.model("TimeLogStore", {
@@ -14,6 +15,12 @@ export const TimeLogStoreModel = types.model("TimeLogStore", {
         return acc;
       }, 0);
     },
+    remove(timeLogId: string) {
+      const timeLog = self.items.find(item => item.id === timeLogId);
+      if (timeLog) {
+        self.items.remove(timeLog);
+      }
+    },
     start({ taskId }: { taskId: string }) {
       // сначала нужно остановить текущий таймер, если он есть
       if (self.currentTimer) {
@@ -26,9 +33,12 @@ export const TimeLogStoreModel = types.model("TimeLogStore", {
         id: Math.random().toString(),
         task: taskId,
         startTime: new Date(),
+        user: getRoot<RootStore>(self).user.items[0].id,
+
       });
       self.items.push(newTimer);
       self.currentTimer = newTimer;
+      
       // найти все TimeLogModel по taskId и подсчитать продолжительность их всех
       return currentDuration;
     },

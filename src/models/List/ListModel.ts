@@ -21,5 +21,5 @@ export const ListModel = types
     setDescription(description: string) {
       console.log("setDescription", description);
       self.description = description;
-    }
+    },
   }));

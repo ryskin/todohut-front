@@ -10,6 +10,7 @@ import { ListModel } from "../List/ListModel";
 import { TaskStatusModel } from "../TaskStatus/TaskStatusModel";
 import { CommentModel } from "../Comment/CommentModel";
 import { RootStore } from "../RootStoreModel";
+import { TimeLog } from "../TimeLog/TimeLogModel";
 
 export const TaskModel = types
   .model("TaskStore", {
@@ -20,7 +21,13 @@ export const TaskModel = types
     name: types.string,
     description: types.maybe(types.string),
     priority: types.optional(
-      types.enumeration("Priority", ["none", "low", "medium", "high", "urgent"]),
+      types.enumeration("Priority", [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "urgent",
+      ]),
       "none"
     ),
     list: types.maybe(types.late(() => types.reference(ListModel))),
@@ -35,12 +42,14 @@ export const TaskModel = types
       []
     ),
     timeEstimate: types.maybeNull(types.number),
+    budget: types.maybeNull(types.number),
+    startDate: types.maybeNull(types.Date),
     dueDate: types.maybe(types.Date),
     createdAt: types.maybe(types.Date),
     updatedAt: types.maybe(types.Date),
   })
   .actions((self) => ({
-    addTimeEstimate(seconds: number){
+    addTimeEstimate(seconds: number) {
       self.timeEstimate = seconds;
     },
     assignUser(userId: string) {
@@ -52,13 +61,28 @@ export const TaskModel = types
       }
     },
     changeStatus(statusId: string) {
-      const statusInstance = getRoot<RootStore>(self).taskStatus.findById(statusId);
+      const statusInstance =
+        getRoot<RootStore>(self).taskStatus.findById(statusId);
       if (statusInstance) {
         self.status = statusInstance;
         return self.status;
       }
     },
-    setPriority(status: typeof self['priority']) {
+    setBudget(budget: number) {
+      self.budget = budget;
+    },
+    setDescription(description: string) {
+      self.description = description;
+    },
+    remove() {
+      const timeLogStore = getRoot<RootStore>(self).timeLog;
+      const timeLogs = timeLogStore.items.filter((item) => item.task.id === self.id);
+      if (timeLogs) {
+        timeLogs.forEach((item: TimeLog) => timeLogStore.remove(item.id));
+      };
+      getRoot<RootStore>(self).task.remove(self.id);
+    },
+    setPriority(status: typeof self["priority"]) {
       console.log(status);
       self.priority = status;
     },
@@ -77,10 +101,28 @@ export const TaskModel = types
     get hasParent(): boolean {
       return Boolean(self.parent);
     },
+    get spendTime(): number {
+      const timeLogs = getRoot<RootStore>(self).timeLog.items.filter(
+        (timeLog) => timeLog.task.id === self.id
+      );
+      return timeLogs.reduce((acc, timeLog) => {
+        return acc + timeLog.duration;
+      }
+      , 0) / 1000;
+    },
     get timeTracked(): number {
       const timeLog = getRoot<RootStore>(self).timeLog;
       return timeLog.taskDuration(self.id);
     },
+    get spendMoney(): number {
+      const timeLogs = getRoot<RootStore>(self).timeLog.items.filter(
+        (timeLog) => timeLog.task.id === self.id
+      );
+      return timeLogs.reduce((acc, timeLog) => {
+        return acc + timeLog.price;
+      }
+      , 0) / 1000;
+    }
   }));
 
 type TaskType = Instance<typeof TaskModel>;

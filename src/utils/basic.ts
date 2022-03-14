@@ -91,6 +91,10 @@ export const getWeekDays = ({ locale }: { locale: Locale }): string[] => {
   return weekDays;
 };
 
+export const roundDecimal = (num: number, decimals: number) => {
+  return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
+};
+
 //compare if dates object are equal days
 export const isDatesEqual = (date1?: Date | null, date2?: Date | null) => {
   if (!date1 || !date2) return false;

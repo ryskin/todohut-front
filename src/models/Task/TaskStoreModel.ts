@@ -1,4 +1,5 @@
 import {
+  getRoot,
   Instance,
   resolveIdentifier,
   SnapshotOut,
@@ -6,6 +7,8 @@ import {
 } from "mobx-state-tree";
 import { randomId } from "../../utils/basic";
 import { TaskModel } from "./TaskModel";
+import { RootStore } from "../RootStoreModel";
+import { TimeLog } from "../TimeLog/TimeLogModel";
 
 export const TaskStoreModel = types
   .model("TaskStoreModel", {
@@ -24,10 +27,18 @@ export const TaskStoreModel = types
       const instance = resolveIdentifier(TaskModel, self, taskId);
       if (!instance) return;
       console.log("remove", instance);
+      const timeLogStore = getRoot<RootStore>(self).timeLog;
+      const timeLogs = timeLogStore.items.filter((item) => item.task.id === taskId);
+      if (timeLogs) {
+        timeLogs.forEach((item: TimeLog) => timeLogStore.remove(item.id));
+      };
       if (instance?.subTasks && instance.subTasks.length > 0) {
-        alert("You can't remove a task that has a sub task");
-        return;
+        alert("Remove subtasks");
+        // return;
       }
+      //remove subtasks first
+      const children = self.items.filter((item) => item.parent?.id === taskId);
+      children.forEach((item) => item.remove());
       self.items.remove(instance);
     },
     update(id: string, item: any) {

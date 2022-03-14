@@ -27,6 +27,7 @@ import { PriorityPopover } from "../PriorityPopover";
 import { useCallback, useMemo, useRef } from "react";
 import { TaskMenu } from "../TaskMenu/TaskMenu";
 import { Link } from "react-router-dom";
+import { BudgetCell } from "../BudgetCell";
 
 type GropedTasks = {
   [key: string]: Task[] | any;
@@ -147,6 +148,14 @@ export const ToDoTable = observer(() => {
             </div>
           );
         },
+      },
+      {
+        Header: "Budget",
+        accessor: "budget",
+        disableFilters: true,
+        Cell: ({ value, row: { original: { id }} }: CellProps<any>) => (
+          <BudgetCell taskId={id} />
+        ),
       },
       {
         Header: "Time estimate",

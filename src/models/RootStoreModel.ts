@@ -16,7 +16,13 @@ export const RootStoreModel = types.model("RootStore", {
   timeLog: types.optional(TimeLogStoreModel, {} as any),
   user: types.optional(UserStoreModel, {} as any),
   comment: types.optional(CommentStoreModel, {} as any),
+  rehydrated: types.optional(types.boolean, false),
 })
+.actions(self => ({
+  setRehydrated() {
+    self.rehydrated = true;
+  },
+}))
 .extend(
   localStorageMixin({
     throttle: 1000,

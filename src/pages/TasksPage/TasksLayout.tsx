@@ -1,4 +1,4 @@
-import { DocumentTextIcon, SearchIcon } from "@heroicons/react/solid";
+import { DocumentTextIcon } from "@heroicons/react/solid";
 import { observer } from "mobx-react-lite";
 import Editor from "rich-markdown-editor";
 import { AddListForm } from "../../components/AddListForm/AddListForm";
@@ -6,11 +6,14 @@ import { ToDoTable } from "../../components/ToDoTable";
 import { useStore } from "../../models/StoreContext";
 import mainImage from "../../assets/main.png";
 import { light } from "rich-markdown-editor/dist/styles/theme";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import { Outlet } from "react-router-dom";
 import { ListContextMenu } from "../../components/ListContextMenu";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  roundDecimal,
+  secondsToHHMM,
+  secondsToHHMMSS,
+} from "../../utils/basic";
 
 type ITaskItem = {
   id: string;
@@ -120,15 +123,42 @@ const ListItems = observer(() => {
 
 export const TasksLayout = observer(() => {
   const store = useStore();
+  const [editorInitialValue, setEditorInitialValue] = useState(
+    store?.list?.selected?.description
+  );
 
   const handleChangeDescription = (data: any) => {
     const text = data();
     store?.list?.selected?.setDescription(text);
   };
 
+  useEffect(() => {
+    setEditorInitialValue(store?.list?.selected?.description);
+  }, [store?.list?.selected]);
+
+  const totalBudget = store?.list?.selected?.tasks.reduce(
+    (acc: number, task: any) => acc + task.budget,
+    0
+  );
+
+  const totalEstimatedTime = store?.list?.selected?.tasks.reduce(
+    (acc: number, task: any) => acc + task.timeEstimate,
+    0
+  );
+
+  const spendTime = store?.list?.selected?.tasks.reduce(
+    (acc: number, task: any) => acc + task.spendTime,
+    0
+  );
+
+  const totalSpendMoney = store?.list?.selected?.tasks.reduce(
+    (acc: number, task: any) => acc + task.spendMoney,
+    0
+  );
+
   return (
     <>
-      <Outlet/>
+      <Outlet />
       <div className="w-64 bg-gray-100 flex flex-col space-y-4">
         <div>
           <div className="flex flex-row justify-between items-center p-4 mb-2">
@@ -147,10 +177,46 @@ export const TasksLayout = observer(() => {
               <Editor
                 theme={{ ...light, background: "rgb(249 250 251)" }}
                 onChange={handleChangeDescription}
+                value={editorInitialValue}
                 defaultValue={store?.list?.selected?.description}
               />
             </div>
           }
+          <div className="flex flex-row gap-2">
+            {!!totalBudget && (
+              <div className="flex border- flex-col justify-between p-4 mb-2 uppercase bg-yellow-400 rounded-lg">
+                <h1 className="flex-auto font-semibold text-sm text-gray-500">
+                  Budget
+                </h1>
+                ${totalBudget}
+              </div>
+            )}
+
+            {!!totalEstimatedTime && (
+              <div className="flex border- flex-col justify-between p-4 mb-2 uppercase bg-blue-200 rounded-lg ">
+                <h1 className="flex-auto font-semibold text-sm text-gray-500">
+                  Time Estimate
+                </h1>
+                {secondsToHHMM(totalEstimatedTime)}
+              </div>
+            )}
+            {!!spendTime && (
+              <div className="flex border- flex-col justify-between p-4 mb-2 uppercase bg-green-200 rounded-lg ">
+                <h1 className="flex-auto font-semibold text-sm text-gray-500">
+                  Time Spend
+                </h1>
+                {secondsToHHMMSS(spendTime)}
+              </div>
+            )}
+            {!!totalSpendMoney && (
+              <div className="flex border- flex-col justify-between p-4 mb-2 uppercase bg-purple-200 rounded-lg ">
+                <h1 className="flex-auto font-semibold text-sm text-gray-500">
+                  Money Spend
+                </h1>
+                {roundDecimal(totalSpendMoney, 2)}
+              </div>
+            )}
+          </div>
           {store.list.selected ? <ToDoTable /> : <img src={mainImage} alt="" />}
         </div>
       </div>

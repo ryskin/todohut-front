@@ -1,4 +1,4 @@
-import { Instance, SnapshotOut, types } from "mobx-state-tree";
+import { Instance, SnapshotOut, types, getRoot } from "mobx-state-tree";
 import { TaskModel } from "../Task/TaskModel";
 import { UserModel } from "../User/UserModel";
 
@@ -11,6 +11,9 @@ export const TimeLogModel = types
     endTime: types.maybe(types.Date),
   })
   .views((self) => ({
+    get price() {
+      return this.duration / 3600 * (self.user?.rate || 0);
+    },
     get duration() {
       if (!self.endTime) {
         const timeNow = new Date();

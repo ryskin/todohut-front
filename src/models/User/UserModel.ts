@@ -7,6 +7,7 @@ export const UserModel = types
     firstName: types.maybe(types.string),
     lastName: types.maybe(types.string),
     email: types.string,
+    rate: types.maybeNull(types.number),
     createdAt: types.maybe(types.Date),
     updatedAt: types.maybe(types.Date),
   })
