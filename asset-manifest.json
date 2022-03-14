@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/todohut-front/static/css/main.65e01966.css",
-    "main.js": "/todohut-front/static/js/main.b555f859.js",
+    "main.js": "/todohut-front/static/js/main.0a30274d.js",
     "static/js/787.1c3bfe9d.chunk.js": "/todohut-front/static/js/787.1c3bfe9d.chunk.js",
     "static/media/main.png": "/todohut-front/static/media/main.b3c789ee086c07ab17e3.png",
     "index.html": "/todohut-front/index.html",
     "main.65e01966.css.map": "/todohut-front/static/css/main.65e01966.css.map",
-    "main.b555f859.js.map": "/todohut-front/static/js/main.b555f859.js.map",
+    "main.0a30274d.js.map": "/todohut-front/static/js/main.0a30274d.js.map",
     "787.1c3bfe9d.chunk.js.map": "/todohut-front/static/js/787.1c3bfe9d.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.65e01966.css",
-    "static/js/main.b555f859.js"
+    "static/js/main.0a30274d.js"
   ]
 }
